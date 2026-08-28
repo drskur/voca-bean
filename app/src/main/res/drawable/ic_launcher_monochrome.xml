@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 몸통 실루엣 (눈·입은 evenOdd 홀 처리) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="
+            M54,35 C63.94,35 72,44.4 72,56 C72,67.6 63.94,77 54,77 C44.06,77 36,67.6 36,56 C36,44.4 44.06,35 54,35 Z
+            M47,48.4 C48.05,48.4 48.9,49.56 48.9,51 C48.9,52.44 48.05,53.6 47,53.6 C45.95,53.6 45.1,52.44 45.1,51 C45.1,49.56 45.95,48.4 47,48.4 Z
+            M61,48.4 C62.05,48.4 62.9,49.56 62.9,51 C62.9,52.44 62.05,53.6 61,53.6 C59.95,53.6 59.1,52.44 59.1,51 C59.1,49.56 59.95,48.4 61,48.4 Z
+            M48.5,60.5 Q54,66.5 59.5,60.5 Q54,62.5 48.5,60.5 Z" />
+
+    <!-- 새싹 줄기 -->
+    <path
+        android:pathData="M54,37 L54,30.5"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.4"
+        android:strokeLineCap="round" />
+
+    <!-- 새싹 잎 (좌) -->
+    <group
+        android:rotation="35"
+        android:pivotX="48.8"
+        android:pivotY="29.8">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M48.8,27.5 C51.84,27.5 54.3,28.53 54.3,29.8 C54.3,31.07 51.84,32.1 48.8,32.1 C45.76,32.1 43.3,31.07 43.3,29.8 C43.3,28.53 45.76,27.5 48.8,27.5 Z" />
+    </group>
+
+    <!-- 새싹 잎 (우) -->
+    <group
+        android:rotation="-35"
+        android:pivotX="59.2"
+        android:pivotY="29.8">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M59.2,27.5 C62.24,27.5 64.7,28.53 64.7,29.8 C64.7,31.07 62.24,32.1 59.2,32.1 C56.16,32.1 53.7,31.07 53.7,29.8 C53.7,28.53 56.16,27.5 59.2,27.5 Z" />
+    </group>
+</vector>
