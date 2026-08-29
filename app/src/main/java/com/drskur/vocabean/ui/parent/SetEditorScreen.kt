@@ -181,12 +181,17 @@ fun SetEditorScreen(
                         value = korean,
                         onValueChange = { korean = it },
                         label = { Text("뜻") },
-                        placeholder = { Text("강아지") },
+                        placeholder = { Text("강아지, 멍멍이") },
                         singleLine = true,
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier.weight(1f)
                     )
                 }
+                Text(
+                    text = "💡 뜻이 여러 개면 , 로 구분해요",
+                    fontSize = 12.sp,
+                    color = InkBrown.copy(alpha = 0.5f)
+                )
                 Spacer(Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -376,7 +381,7 @@ private fun WordRow(word: Word, onDelete: () -> Unit) {
         )
         Spacer(Modifier.width(6.dp))
         Text(
-            text = word.korean,
+            text = word.displayKorean,
             fontSize = 16.sp,
             color = InkBrown
         )

@@ -393,7 +393,7 @@ private fun PlayingContent(
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        text = "정답: ${question.answer}",
+                        text = "정답: ${question.answerDisplay}",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = InkBrown

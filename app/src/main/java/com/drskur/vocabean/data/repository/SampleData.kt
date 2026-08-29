@@ -20,7 +20,12 @@ object SampleData {
                 Word("sample-animal-2", "cat", "고양이", "🐱"),
                 Word("sample-animal-3", "rabbit", "토끼", "🐰"),
                 Word("sample-animal-4", "bird", "새", "🐦"),
-                Word("sample-animal-5", "fish", "물고기", "🐟"),
+                Word(
+                    id = "sample-animal-5",
+                    english = "fish",
+                    koreans = listOf("물고기", "생선"),
+                    emoji = "🐟"
+                ),
                 Word("sample-animal-6", "bear", "곰", "🐻")
             )
         ),
@@ -46,8 +51,18 @@ object SampleData {
             colorIndex = 2,
             createdAt = 3_000L,
             words = listOf(
-                Word("sample-color-1", "red", "빨간색", "❤️"),
-                Word("sample-color-2", "blue", "파란색", "💙"),
+                Word(
+                    id = "sample-color-1",
+                    english = "red",
+                    koreans = listOf("빨간색", "빨강"),
+                    emoji = "❤️"
+                ),
+                Word(
+                    id = "sample-color-2",
+                    english = "blue",
+                    koreans = listOf("파란색", "파랑"),
+                    emoji = "💙"
+                ),
                 Word("sample-color-3", "yellow", "노란색", "💛"),
                 Word("sample-color-4", "green", "초록색", "💚"),
                 Word("sample-color-5", "pink", "분홍색", "🩷"),

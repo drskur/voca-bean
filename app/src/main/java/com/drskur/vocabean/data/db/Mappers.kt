@@ -17,7 +17,8 @@ internal fun Word.toEntity(setId: String): WordEntity = WordEntity(
     id = id,
     setId = setId,
     english = english,
-    korean = korean,
+    // 뜻이 여러 개면 쉼표로 이어 한 칼럼에 저장한다.
+    korean = koreans.joinToString(", "),
     emoji = emoji
 )
 
@@ -33,6 +34,8 @@ internal fun WordSetWithWords.toDomain(): WordSet = WordSet(
 internal fun WordEntity.toDomain(): Word = Word(
     id = id,
     english = english,
-    korean = korean,
+    koreans = korean.split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() },
     emoji = emoji
 )

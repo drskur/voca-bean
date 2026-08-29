@@ -67,7 +67,7 @@ class InMemoryWordSetRepositoryTest {
         assertEquals(2, repository.getSet("s1")?.wordCount)
 
         repository.updateWord("s1", Word("w2", "bus", "학교 버스", "🚌"))
-        assertEquals("학교 버스", repository.getSet("s1")?.words?.find { it.id == "w2" }?.korean)
+        assertEquals("학교 버스", repository.getSet("s1")?.words?.find { it.id == "w2" }?.displayKorean)
 
         repository.deleteWord("s1", "w2")
         assertEquals(1, repository.getSet("s1")?.wordCount)

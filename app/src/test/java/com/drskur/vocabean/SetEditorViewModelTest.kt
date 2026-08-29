@@ -110,6 +110,17 @@ class SetEditorViewModelTest {
     }
 
     @Test
+    fun `뜻을 쉼표로 여러 개 입력하면 모두 저장된다`() = runTest(dispatcher) {
+        val repository = InMemoryWordSetRepository(initialSets = emptyList())
+        val viewModel = SetEditorViewModel(repository, setId = null)
+
+        assertTrue(viewModel.addWord("apple", "사과, 능금", null))
+        val word = viewModel.state.value.words.single()
+        assertEquals(listOf("사과", "능금"), word.koreans)
+        assertEquals("사과, 능금", word.displayKorean)
+    }
+
+    @Test
     fun `존재하지 않는 세트 id는 새 세트로 취급한다`() = runTest(dispatcher) {
         val repository = InMemoryWordSetRepository(initialSets = emptyList())
         val viewModel = SetEditorViewModel(repository, setId = "ghost")

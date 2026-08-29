@@ -66,16 +66,21 @@ class SetEditorViewModel(
 
     fun setColor(colorIndex: Int) = _state.update { it.copy(colorIndex = colorIndex) }
 
-    /** 단어 추가. 영어·뜻이 모두 비어 있지 않으면 true */
+    /**
+     * 단어 추가. 뜻은 쉼표로 여러 개 입력할 수 있다.
+     * 영어와 뜻이 모두 하나 이상 있어야 true.
+     */
     fun addWord(english: String, korean: String, emoji: String?): Boolean {
         val e = english.trim()
-        val k = korean.trim()
-        if (e.isEmpty() || k.isEmpty()) return false
+        val meanings = korean.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        if (e.isEmpty() || meanings.isEmpty()) return false
         _state.update {
             it.copy(
                 words = it.words + Word(
                     english = e,
-                    korean = k,
+                    koreans = meanings,
                     emoji = emoji?.trim()?.takeIf(String::isNotEmpty)
                 )
             )

@@ -33,13 +33,24 @@ data class QuizQuestion(
     val prompt: String
         get() = when (type) {
             QuizType.ENGLISH_TO_KOREAN -> word.english
-            QuizType.KOREAN_TO_ENGLISH -> word.korean
+            // 한국말을 보고 영어를 쓸 때는 뜻이 여러 개면 모두 보여준다
+            QuizType.KOREAN_TO_ENGLISH -> word.displayKorean
         }
 
-    /** 정답 */
-    val answer: String
+    /** 채점 기준이 되는 수용 정답 목록 */
+    private val acceptedAnswers: List<String>
         get() = when (type) {
-            QuizType.ENGLISH_TO_KOREAN -> word.korean
+            QuizType.ENGLISH_TO_KOREAN -> word.koreans
+            QuizType.KOREAN_TO_ENGLISH -> listOf(word.english)
+        }
+
+    /** 대표 정답 (표시·테스트용 첫 값) */
+    val answer: String get() = acceptedAnswers.firstOrNull() ?: ""
+
+    /** 오답 피드백에 보여줄 정답. 한국말 뜻이 여러 개면 모두 보여준다. */
+    val answerDisplay: String
+        get() = when (type) {
+            QuizType.ENGLISH_TO_KOREAN -> word.displayKorean
             QuizType.KOREAN_TO_ENGLISH -> word.english
         }
 
@@ -47,14 +58,16 @@ data class QuizQuestion(
      * 주관식 채점.
      * - 공통: 양쪽 공백 제거, 빈 입력은 오답
      * - 영어 정답: 대소문자 구분 없음
-     * - 한국말 정답: 글자 그대로 비교
+     * - 한국말 정답(뜻 맞히기): [Word.koreans] 중 하나만 맞아도 정답, 글자 그대로 비교
      */
     fun isCorrect(input: String): Boolean {
         val trimmed = input.trim()
         if (trimmed.isEmpty()) return false
         return when (type) {
-            QuizType.KOREAN_TO_ENGLISH -> trimmed.equals(answer.trim(), ignoreCase = true)
-            QuizType.ENGLISH_TO_KOREAN -> trimmed == answer.trim()
+            QuizType.KOREAN_TO_ENGLISH ->
+                acceptedAnswers.any { trimmed.equals(it.trim(), ignoreCase = true) }
+            QuizType.ENGLISH_TO_KOREAN ->
+                acceptedAnswers.any { trimmed == it.trim() }
         }
     }
 }

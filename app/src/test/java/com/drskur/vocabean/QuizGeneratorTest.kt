@@ -74,10 +74,10 @@ class QuizGeneratorTest {
     fun `prompt와 answer가 유형에 맞게 나온다`() {
         val meaning = QuizGenerator.generate(set, QuizMode.MEANING, Random(7)).first()
         assertEquals(meaning.word.english, meaning.prompt)
-        assertEquals(meaning.word.korean, meaning.answer)
+        assertEquals(meaning.word.primaryKorean, meaning.answer)
 
         val english = QuizGenerator.generate(set, QuizMode.ENGLISH, Random(7)).first()
-        assertEquals(english.word.korean, english.prompt)
+        assertEquals(english.word.displayKorean, english.prompt)
         assertEquals(english.word.english, english.answer)
     }
 
@@ -95,7 +95,7 @@ class QuizGeneratorTest {
     @Test
     fun `채점 - 한국말은 글자 그대로 비교한다`() {
         val question = QuizGenerator.generate(set, QuizMode.MEANING, Random(1))
-            .first { it.word.korean == "사과" }
+            .first { "사과" in it.word.koreans }
         assertTrue(question.isCorrect("사과"))
         assertTrue(question.isCorrect("  사과  "))
         assertFalse(question.isCorrect("사과요"))
@@ -107,5 +107,33 @@ class QuizGeneratorTest {
         val question = QuizGenerator.generate(set, QuizMode.MEANING, Random(1)).first()
         assertFalse(question.isCorrect(""))
         assertFalse(question.isCorrect("   "))
+    }
+
+    @Test
+    fun `채점 - 한국어 뜻이 여러 개면 어느 하나만 맞아도 정답이다`() {
+        val multi = WordSet(
+            id = "multi",
+            name = "여러 뜻",
+            emoji = "🌈",
+            words = listOf(
+                Word(id = "a", english = "apple", koreans = listOf("사과", "능금"), emoji = "🍎")
+            )
+        )
+        val meaning = QuizGenerator.generate(multi, QuizMode.MEANING, Random(1)).first()
+        assertEquals(QuizType.ENGLISH_TO_KOREAN, meaning.type)
+        assertEquals("apple", meaning.prompt)
+        assertEquals("사과, 능금", meaning.answerDisplay)
+        assertTrue(meaning.isCorrect("사과"))
+        assertTrue(meaning.isCorrect("능금"))
+        assertTrue(meaning.isCorrect("  능금  "))
+        assertFalse(meaning.isCorrect("사과, 능금"))
+        assertFalse(meaning.isCorrect("배"))
+
+        // 영어 쓰기 모드에서는 프롬프트가 모든 뜻을 보여준다
+        val english = QuizGenerator.generate(multi, QuizMode.ENGLISH, Random(1)).first()
+        assertEquals(QuizType.KOREAN_TO_ENGLISH, english.type)
+        assertEquals("사과, 능금", english.prompt)
+        assertEquals("apple", english.answerDisplay)
+        assertTrue(english.isCorrect("apple"))
     }
 }

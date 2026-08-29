@@ -119,7 +119,7 @@ class RoomWordSetRepositoryTest {
         val loaded = repository.getSet("sync")!!
         assertEquals("숫자 놀이", loaded.name)
         assertEquals(setOf("n1", "n3", "n4"), loaded.words.map { it.id }.toSet())
-        assertEquals("하나 (1)", loaded.words.first { it.id == "n1" }.korean)
+        assertEquals("하나 (1)", loaded.words.first { it.id == "n1" }.displayKorean)
     }
 
     @Test
@@ -149,10 +149,29 @@ class RoomWordSetRepositoryTest {
         assertEquals(1, repository.getSet("words")?.wordCount)
 
         repository.updateWord("words", Word("w1", "dog", "멍멍이", "🐶"))
-        assertEquals("멍멍이", repository.getSet("words")?.words?.first()?.korean)
+        assertEquals("멍멍이", repository.getSet("words")?.words?.first()?.displayKorean)
 
         repository.deleteWord("words", "w1")
         assertEquals(0, repository.getSet("words")?.wordCount)
+    }
+
+    @Test
+    fun `단어의 여러 뜻이 Room을 거쳐 보존된다`() = runTest {
+        repository.upsertSet(
+            WordSet(
+                id = "multi",
+                name = "여러 뜻",
+                emoji = "🌈",
+                createdAt = 60_000L,
+                words = listOf(
+                    Word(id = "m1", english = "apple", koreans = listOf("사과", "능금"), emoji = "🍎")
+                )
+            )
+        )
+
+        val word = repository.getSet("multi")!!.words.single()
+        assertEquals(listOf("사과", "능금"), word.koreans)
+        assertEquals("사과, 능금", word.displayKorean)
     }
 
     @Test
