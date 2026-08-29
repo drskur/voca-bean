@@ -37,6 +37,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +65,15 @@ import com.drskur.vocabean.ui.theme.InkBrown
 import com.drskur.vocabean.ui.theme.SkyMiddle
 import com.drskur.vocabean.ui.theme.SkyTop
 import com.drskur.vocabean.ui.theme.VocaBeanTheme
+
+/**
+ * 글자를 가리지 않는 항등 VisualTransformation.
+ * 자동완성 차단용 [KeyboardType.Password]와 함께 쓰면 제안·자동수정은 끄되
+ * 입력한 글자는 그대로 보이게 한다 (Compose 최신 버전에 VisiblePassword 타입이 없어서 사용).
+ */
+private val NoMaskTransformation = VisualTransformation { text ->
+    TransformedText(text, OffsetMapping.Identity)
+}
 
 /**
  * 퀴즈 화면.
@@ -424,7 +437,14 @@ private fun PlayingContent(
                     textAlign = TextAlign.Center
                 )
             },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            // 자동완성/추천 단어가 정답을 알려주지 않도록 Password 키보드를 쓴다.
+            // Password 타입은 제안·자동수정을 끄지만 글자를 가리므로,
+            // [NoMaskTransformation]으로 글자가 그대로 보이게 한다.
+            visualTransformation = NoMaskTransformation,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
             keyboardActions = KeyboardActions(
                 onDone = { if (playing.feedback == null) onSubmit() else onNext() }
             ),
