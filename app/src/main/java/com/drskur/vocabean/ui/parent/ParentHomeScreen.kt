@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,6 +44,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.drskur.vocabean.data.model.WordSet
 import com.drskur.vocabean.data.repository.WordSetRepository
 import com.drskur.vocabean.ui.common.CircleBackButton
+import com.drskur.vocabean.ui.common.MaxContentWidth
 import com.drskur.vocabean.ui.common.noRippleClickable
 import com.drskur.vocabean.ui.theme.BeanGreen
 import com.drskur.vocabean.ui.theme.CreamBottom
@@ -52,6 +55,8 @@ import com.drskur.vocabean.ui.theme.setPaletteColor
 @Composable
 fun ParentHomeScreen(
     repository: WordSetRepository,
+    soundEnabled: Boolean = true,
+    onSoundEnabledChange: (Boolean) -> Unit = {},
     onBackClick: () -> Unit = {},
     onAddSet: () -> Unit = {},
     onEditSet: (String) -> Unit = {}
@@ -69,13 +74,15 @@ fun ParentHomeScreen(
             .fillMaxSize()
             .background(CreamBottom)
             .statusBarsPadding()
-            .navigationBarsPadding()
+            .navigationBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 헤더
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .widthIn(max = MaxContentWidth)
                 .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             CircleBackButton(onClick = onBackClick)
@@ -88,9 +95,31 @@ fun ParentHomeScreen(
             )
         }
 
+        // 소리 효과 토글
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .widthIn(max = MaxContentWidth)
+                .padding(horizontal = 20.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = "🔊 소리 효과",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = InkBrown
+            )
+            Spacer(Modifier.weight(1f))
+            Switch(
+                checked = soundEnabled,
+                onCheckedChange = onSoundEnabledChange
+            )
+        }
+
         // 세트 목록
         LazyColumn(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .widthIn(max = MaxContentWidth),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -107,7 +136,7 @@ fun ParentHomeScreen(
         }
 
         // 새 세트 만들기 버튼
-        Box(Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
+        Box(Modifier.padding(horizontal = 20.dp, vertical = 14.dp).widthIn(max = 480.dp)) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

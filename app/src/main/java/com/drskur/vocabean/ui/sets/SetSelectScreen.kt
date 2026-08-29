@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -32,7 +33,10 @@ import com.drskur.vocabean.data.model.WordSet
 import com.drskur.vocabean.data.repository.InMemoryWordSetRepository
 import com.drskur.vocabean.data.repository.SampleData
 import com.drskur.vocabean.data.repository.WordSetRepository
+import com.drskur.vocabean.sound.LocalSoundPlayer
+import com.drskur.vocabean.sound.SoundEffect
 import com.drskur.vocabean.ui.common.CircleBackButton
+import com.drskur.vocabean.ui.common.MaxContentWidth
 import com.drskur.vocabean.ui.common.noRippleClickable
 import com.drskur.vocabean.ui.theme.CreamBottom
 import com.drskur.vocabean.ui.theme.InkBrown
@@ -49,11 +53,13 @@ fun SetSelectScreen(
     onSetClick: (String) -> Unit = {}
 ) {
     val sets by repository.sets.collectAsState()
+    val sound = LocalSoundPlayer.current
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(SkyTop, SkyMiddle, CreamBottom)))
+            .background(Brush.verticalGradient(listOf(SkyTop, SkyMiddle, CreamBottom))),
+        contentAlignment = Alignment.TopCenter
     ) {
         // 언덕
         Box(
@@ -70,8 +76,10 @@ fun SetSelectScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .widthIn(max = MaxContentWidth)
                 .statusBarsPadding()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(8.dp))
 
@@ -126,14 +134,17 @@ fun SetSelectScreen(
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = GridCells.Adaptive(minSize = 150.dp),
                     contentPadding = PaddingValues(bottom = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     items(sets, key = { it.id }) { set ->
-                        SetCard(set = set, onClick = { onSetClick(set.id) })
+                        SetCard(set = set, onClick = {
+                            sound.play(SoundEffect.TAP)
+                            onSetClick(set.id)
+                        })
                     }
                 }
             }

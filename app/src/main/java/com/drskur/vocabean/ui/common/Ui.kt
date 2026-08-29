@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drskur.vocabean.ui.theme.InkBrown
 
+/** 태블릿 등 넓은 화면에서 콘텐츠가 지나치게 늘어나지 않도록 하는 최대 폭 */
+val MaxContentWidth = 640.dp
+
 /** 리플 없는 클릭 modifier (앱 전체 터치 피드백 정책) */
 @Composable
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier {

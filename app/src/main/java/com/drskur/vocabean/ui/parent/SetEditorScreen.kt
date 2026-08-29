@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -42,6 +43,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.drskur.vocabean.data.model.Word
 import com.drskur.vocabean.data.repository.WordSetRepository
 import com.drskur.vocabean.ui.common.CircleBackButton
+import com.drskur.vocabean.ui.common.MaxContentWidth
 import com.drskur.vocabean.ui.common.noRippleClickable
 import com.drskur.vocabean.ui.theme.BeanGreen
 import com.drskur.vocabean.ui.theme.BeanLight
@@ -78,11 +80,13 @@ fun SetEditorScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(CreamBottom)
+            .background(CreamBottom),
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .widthIn(max = MaxContentWidth)
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
@@ -238,6 +242,7 @@ fun SetEditorScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
+                    .widthIn(max = MaxContentWidth)
                     .background(CreamBottom)
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .navigationBarsPadding()

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -65,12 +66,16 @@ import com.drskur.vocabean.ui.theme.SkyTop
 import com.drskur.vocabean.ui.theme.SunnyYellow
 import com.drskur.vocabean.ui.theme.Tangerine
 import com.drskur.vocabean.ui.theme.VocaBeanTheme
+import com.drskur.vocabean.sound.LocalSoundPlayer
+import com.drskur.vocabean.sound.SoundEffect
 
 @Composable
 fun LandingScreen(
     onStartClick: () -> Unit = {},
     onParentClick: () -> Unit = {}
 ) {
+    val sound = LocalSoundPlayer.current
+
     Scaffold(containerColor = Color.Transparent) { innerPadding ->
         Box(
             modifier = Modifier
@@ -152,7 +157,8 @@ fun LandingScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
@@ -178,10 +184,14 @@ fun LandingScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .widthIn(max = 480.dp)
                         .padding(bottom = 30.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    PulsingStartButton(onClick = onStartClick)
+                    PulsingStartButton(onClick = {
+                        sound.play(SoundEffect.TAP)
+                        onStartClick()
+                    })
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "보호자 설정",

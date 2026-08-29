@@ -1,11 +1,13 @@
 package com.drskur.vocabean
 
+import com.drskur.vocabean.data.model.QuizMode
 import com.drskur.vocabean.data.model.QuizType
 import com.drskur.vocabean.data.model.Word
 import com.drskur.vocabean.data.model.WordSet
 import com.drskur.vocabean.data.quiz.QuizGenerator
 import kotlin.random.Random
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -27,71 +29,83 @@ class QuizGeneratorTest {
 
     @Test
     fun `빈 세트는 빈 퀴즈를 반환한다`() {
-        val empty = set.copy(words = emptyList())
-        assertTrue(QuizGenerator.generate(empty).isEmpty())
+        assertTrue(QuizGenerator.generate(set.copy(words = emptyList()), QuizMode.MIXED).isEmpty())
     }
 
     @Test
-    fun `문제 수는 단어 수를 넘을 수 없다`() {
-        val questions = QuizGenerator.generate(set, questionCount = 100)
-        assertEquals(set.wordCount, questions.size)
-    }
-
-    @Test
-    fun `요청한 문제 수만큼 생성한다`() {
-        assertEquals(3, QuizGenerator.generate(set, questionCount = 3).size)
-    }
-
-    @Test
-    fun `정답이 항상 선택지에 포함되고 answerIndex가 가리킨다`() {
-        repeat(50) { seed ->
-            val questions = QuizGenerator.generate(set, random = Random(seed))
-            questions.forEach { q ->
-                val expected = when (q.type) {
-                    QuizType.ENGLISH_TO_KOREAN -> q.word.korean
-                    QuizType.KOREAN_TO_ENGLISH -> q.word.english
-                }
-                assertEquals(expected, q.options[q.answerIndex])
-                assertEquals(expected, q.answer)
-            }
-        }
-    }
-
-    @Test
-    fun `선택지에는 중복이 없다`() {
-        repeat(50) { seed ->
-            QuizGenerator.generate(set, random = Random(seed)).forEach { q ->
-                assertEquals(q.options.size, q.options.distinct().size)
-            }
-        }
-    }
-
-    @Test
-    fun `단어가 4개 이상이면 선택지는 4개다`() {
-        val questions = QuizGenerator.generate(set, random = Random(42))
-        questions.forEach { q ->
-            assertEquals(4, q.options.size)
-        }
-    }
-
-    @Test
-    fun `단어가 적으면 선택지 개수가 줄어든다`() {
-        val small = set.copy(
-            words = listOf(
-                Word("1", "apple", "사과"),
-                Word("2", "banana", "바나나")
+    fun `모든 단어가 한 번씩 나온다`() {
+        repeat(20) { seed ->
+            val questions = QuizGenerator.generate(set, QuizMode.MIXED, Random(seed))
+            assertEquals(set.words.size, questions.size)
+            assertEquals(
+                set.words.map { it.id }.toSet(),
+                questions.map { it.word.id }.toSet()
             )
-        )
-        val questions = QuizGenerator.generate(small, random = Random(1))
-        assertEquals(2, questions.size)
-        questions.forEach { q ->
-            assertTrue(q.options.size in 1..2)
         }
     }
 
     @Test
-    fun `같은 단어로 중복 출제되지 않는다`() {
-        val questions = QuizGenerator.generate(set, random = Random(7))
-        assertEquals(questions.size, questions.map { it.word.id }.distinct().size)
+    fun `뜻 맞히기 모드는 전부 영어에서 한국말로 낸다`() {
+        val questions = QuizGenerator.generate(set, QuizMode.MEANING, Random(1))
+        assertTrue(questions.all { it.type == QuizType.ENGLISH_TO_KOREAN })
+    }
+
+    @Test
+    fun `영어 쓰기 모드는 전부 한국말에서 영어로 낸다`() {
+        val questions = QuizGenerator.generate(set, QuizMode.ENGLISH, Random(1))
+        assertTrue(questions.all { it.type == QuizType.KOREAN_TO_ENGLISH })
+    }
+
+    @Test
+    fun `섞어 내기는 두 유형만 나오고 시드마다 조합이 달라진다`() {
+        var sawBoth = false
+        repeat(30) { seed ->
+            val questions = QuizGenerator.generate(set, QuizMode.MIXED, Random(seed))
+            val types = questions.map { it.type }.toSet()
+            assertTrue(types.all {
+                it == QuizType.ENGLISH_TO_KOREAN || it == QuizType.KOREAN_TO_ENGLISH
+            })
+            if (types.size == 2) sawBoth = true
+        }
+        assertTrue("30개 시드 안에 두 유형이 섞인 경우가 있어야 한다", sawBoth)
+    }
+
+    @Test
+    fun `prompt와 answer가 유형에 맞게 나온다`() {
+        val meaning = QuizGenerator.generate(set, QuizMode.MEANING, Random(7)).first()
+        assertEquals(meaning.word.english, meaning.prompt)
+        assertEquals(meaning.word.korean, meaning.answer)
+
+        val english = QuizGenerator.generate(set, QuizMode.ENGLISH, Random(7)).first()
+        assertEquals(english.word.korean, english.prompt)
+        assertEquals(english.word.english, english.answer)
+    }
+
+    @Test
+    fun `채점 - 영어는 대소문자와 공백을 무시한다`() {
+        val question = QuizGenerator.generate(set, QuizMode.ENGLISH, Random(1))
+            .first { it.word.english == "apple" }
+        assertTrue(question.isCorrect("apple"))
+        assertTrue(question.isCorrect("Apple"))
+        assertTrue(question.isCorrect("  APPLE  "))
+        assertFalse(question.isCorrect("apples"))
+        assertFalse(question.isCorrect("사과"))
+    }
+
+    @Test
+    fun `채점 - 한국말은 글자 그대로 비교한다`() {
+        val question = QuizGenerator.generate(set, QuizMode.MEANING, Random(1))
+            .first { it.word.korean == "사과" }
+        assertTrue(question.isCorrect("사과"))
+        assertTrue(question.isCorrect("  사과  "))
+        assertFalse(question.isCorrect("사과요"))
+        assertFalse(question.isCorrect("apple"))
+    }
+
+    @Test
+    fun `빈 입력은 오답이다`() {
+        val question = QuizGenerator.generate(set, QuizMode.MEANING, Random(1)).first()
+        assertFalse(question.isCorrect(""))
+        assertFalse(question.isCorrect("   "))
     }
 }

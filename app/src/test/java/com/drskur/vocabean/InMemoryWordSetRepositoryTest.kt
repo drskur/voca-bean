@@ -2,6 +2,7 @@ package com.drskur.vocabean
 
 import com.drskur.vocabean.data.model.Word
 import com.drskur.vocabean.data.model.WordSet
+import com.drskur.vocabean.data.model.QuizMode
 import com.drskur.vocabean.data.quiz.QuizGenerator
 import com.drskur.vocabean.data.repository.InMemoryWordSetRepository
 import com.drskur.vocabean.data.repository.SampleData
@@ -91,9 +92,9 @@ class InMemoryWordSetRepositoryTest {
     @Test
     fun `샘플 세트는 모두 퀴즈 생성이 가능하다`() {
         SampleData.sets.forEach { set ->
-            val questions = QuizGenerator.generate(set)
-            assertTrue("${set.name} 퀴즈 생성 실패", questions.isNotEmpty())
-            assertTrue(questions.all { it.options.size >= 2 })
+            val questions = QuizGenerator.generate(set, QuizMode.MIXED)
+            assertTrue("${set.name} 퀴즈 생성 패", questions.isNotEmpty())
+            assertEquals(set.wordCount, questions.size)
         }
     }
 }
