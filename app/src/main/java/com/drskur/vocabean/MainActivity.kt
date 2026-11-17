@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VocaBeanTheme {
                 VocaBeanApp(container)
+                com.drskur.vocabean.update.UpdatePrompt()
             }
         }
     }

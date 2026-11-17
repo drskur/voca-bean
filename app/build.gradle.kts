@@ -1,8 +1,22 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
+
+val appVersionProperties = Properties().apply {
+    rootProject.file("version.properties").inputStream().use { load(it) }
+}
+val appVersionCode = providers.gradleProperty("versionCode")
+    .getOrElse(appVersionProperties.getProperty("VERSION_CODE"))
+    .toIntOrNull()
+    ?.takeIf { it in 1..2_100_000_000 }
+    ?: error("VERSION_CODE/versionCode must be an integer between 1 and 2100000000")
+val appVersionName = providers.gradleProperty("versionName")
+    .getOrElse(appVersionProperties.getProperty("VERSION_NAME"))
+    .also { require(it.isNotBlank()) { "VERSION_NAME/versionName must not be blank" } }
 
 android {
     namespace = "com.drskur.vocabean"
@@ -14,8 +28,8 @@ android {
         applicationId = "com.drskur.vocabean"
         minSdk = 31
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

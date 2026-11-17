@@ -1,0 +1,15 @@
+[tasks.build]
+description = "Debug APK 빌드"
+run = "bash ./gradlew :app:assembleDebug"
+
+[tasks.test]
+description = "단위 테스트 실행"
+run = "bash ./gradlew :app:testDebugUnitTest"
+
+[tasks."release:check"]
+description = "배포 조건 검사 (태그 생성/push 없음)"
+run = "python3 scripts/release.py --check"
+
+[tasks.release]
+description = "현재 버전 태그 생성 및 origin push → GitHub Release Action 실행"
+run = "python3 scripts/release.py"
